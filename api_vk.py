@@ -3,7 +3,7 @@ import os
 import requests
 
 
-class ApiVk:
+class VkApi:
     """
     Загружает случайный комикс xkcd в группу Вк.
     Для работы необходимо получить:

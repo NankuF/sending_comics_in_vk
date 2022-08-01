@@ -6,7 +6,7 @@ import environs
 import requests
 from pathvalidate import sanitize_filename
 
-from api_vk import ApiVk
+from api_vk import VkApi
 
 
 class Xkcd:
@@ -73,7 +73,7 @@ def main():
     xkcd = Xkcd()
     xkcd.get_random_comic()
     xkcd.download_comic()
-    vk = ApiVk(vk_token, group_id, xkcd.comic)
+    vk = VkApi(vk_token, group_id, xkcd.comic)
     vk.get_server_address()
     vk.upload_image_on_server()
     vk.save_comic_in_album()
