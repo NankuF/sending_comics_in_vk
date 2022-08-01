@@ -58,7 +58,7 @@ class VkApi:
         resp.raise_for_status()
         self.photo_info = resp.json()['response'][0]
 
-    def public_comic_on_wall(self):
+    def publish_comic_on_wall(self):
         """
         Публикует комикс на стене.
         """

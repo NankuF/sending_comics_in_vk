@@ -77,7 +77,7 @@ def main():
     vk.get_server_address()
     vk.upload_image_on_server()
     vk.save_comic_in_album()
-    vk.public_comic_on_wall()
+    vk.publish_comic_on_wall()
 
 
 if __name__ == '__main__':
