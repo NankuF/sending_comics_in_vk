@@ -35,7 +35,7 @@ class VkApi:
         self.payload.update({'access_token': self.token, 'v': '5.131', 'group_id': self.group_id})
         resp = self.session.get(url, params=self.payload)
         resp.raise_for_status()
-        self.server_url = resp.json().get('response').get('upload_url')
+        self.server_url = resp.json()['response']['upload_url']
 
     def upload_image_on_server(self):
         """
@@ -55,14 +55,14 @@ class VkApi:
         url = f'{self.api_vk_method}photos.saveWallPhoto'
         resp = self.session.post(url, params=self.payload)
         resp.raise_for_status()
-        self.photo_info = resp.json().get('response')[0]
+        self.photo_info = resp.json()['response'][0]
 
     def public_comic_on_wall(self):
         """
         Публикует комикс на стене.
         """
-        owner_id = f'{self.photo_info.get("owner_id")}'
-        media_id = self.photo_info.get('id')
+        owner_id = self.photo_info['owner_id']
+        media_id = self.photo_info['id']
         self.payload.update(
             {'from_group': 1,
              'attachments': f'photo{owner_id}_{media_id}',
@@ -73,5 +73,7 @@ class VkApi:
         url = f'{self.api_vk_method}wall.post'
         resp = self.session.post(url, params=self.payload)
         resp.raise_for_status()
-        if resp.json().get('response').get('post_id'):
+        if resp.json()['response'].get('post_id'):
             os.remove(self.comic_path)
+        else:
+            print('Комикс не опубликован!')
