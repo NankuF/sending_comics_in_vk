@@ -45,7 +45,8 @@ class VkApi:
             files = {'photo': file}
             response = self.session.post(self.server_url, files=files)
             response.raise_for_status()
-        server, photo, hash_ = response.json().values()
+        response = response.json()
+        server, photo, hash_ = response['server'], response['photo'], response['hash']
         self.payload.update({'server': server, 'photo': photo, 'hash': hash_})
 
     def save_comic_in_album(self):
