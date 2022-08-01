@@ -28,7 +28,7 @@ class Xkcd:
         last_comic_num = last_comic.json()['num']
 
         random_comic_url = f'{self.url}{random.randint(1, last_comic_num)}/info.0.json'
-        resp = self.session.get(f'{random_comic_url}')
+        resp = self.session.get(random_comic_url)
         resp.raise_for_status()
         self.comic = resp.json()
 
