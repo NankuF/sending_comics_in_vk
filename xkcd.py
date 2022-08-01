@@ -14,12 +14,12 @@ class Xkcd:
     Интерфейс для скачивания случайных комиксов xkcd.
     """
 
-    def __init__(self):
+    def __init__(self,):
         self.session = requests.Session()
         self.url = 'https://xkcd.com/'
-        self.comic = None
+        self.comic = self.__get_random_comic()
 
-    def get_random_comic(self):
+    def __get_random_comic(self):
         """
         Получает случайный комикс.
         """
@@ -30,9 +30,9 @@ class Xkcd:
         random_comic_url = f'{self.url}{random.randint(1, last_comic_num)}/info.0.json'
         resp = self.session.get(random_comic_url)
         resp.raise_for_status()
-        self.comic = resp.json()
+        return resp.json()
 
-    def get_filename(self, text: str) -> str:
+    def __get_filename(self, text: str) -> str:
         """
         Сервисная функция для получения названия файла с расширением.
         Очищает строку от запрещенных символов.
@@ -56,12 +56,18 @@ class Xkcd:
         resp = self.session.get(url)
         resp.raise_for_status()
 
-        filename = self.get_filename(url)
+        filename = self.__get_filename(url)
         comic_path = f'{dir_}/{filename}'
         self.comic.update({'comic_path': comic_path})
 
         with open(comic_path, 'wb') as file:
             file.write(resp.content)
+
+    def delete_comic(self):
+        """
+        Удаляет комикс с диска.
+        """
+        os.remove(self.comic['comic_path'])
 
 
 def main():
@@ -71,13 +77,13 @@ def main():
     group_id = env.int('VK_GROUP_ID')
 
     xkcd = Xkcd()
-    xkcd.get_random_comic()
     xkcd.download_comic()
-    vk = VkApi(vk_token, group_id, xkcd.comic)
-    vk.get_server_address()
-    vk.upload_image_on_server()
-    vk.save_comic_in_album()
-    vk.publish_comic_on_wall()
+    xkcd_comic_path = xkcd.comic['comic_path']
+    xkcd_comic_message = xkcd.comic['alt']
+    vk = VkApi(vk_token, group_id)
+    vk.publish_comic(comic_path=xkcd_comic_path, comic_message=xkcd_comic_message)
+    if vk.post_id:
+        xkcd.delete_comic()
 
 
 if __name__ == '__main__':

@@ -1,5 +1,3 @@
-import os
-
 import requests
 
 
@@ -15,19 +13,16 @@ class VkApi:
     У приложения должны быть права: scope=photos,groups,wall,offline
     """
 
-    def __init__(self, token, group_id, comic):
+    def __init__(self, token, group_id):
         self.session = requests.Session()
         self.api_vk_method = 'https://api.vk.com/method/'
         self.token = token
         self.group_id = group_id
         self.payload = {}
-        self.comic = comic
-        self.comic_path = comic['comic_path']
-        self.message = comic['alt']
         self.server_url = None
         self.photo_info = None
 
-    def get_server_address(self):
+    def __get_server_address(self):
         """
         Получает адрес сервера, на который необходимо загрузить комикс.
         """
@@ -37,7 +32,7 @@ class VkApi:
         resp.raise_for_status()
         self.server_url = resp.json()['response']['upload_url']
 
-    def upload_image_on_server(self):
+    def __upload_image_on_server(self):
         """
         Загружает комикс на сервер.
         """
@@ -49,7 +44,7 @@ class VkApi:
         server, photo, hash_ = response['server'], response['photo'], response['hash']
         self.payload.update({'server': server, 'photo': photo, 'hash': hash_})
 
-    def save_comic_in_album(self):
+    def __save_comic_in_album(self):
         """
         Сохраняет комикс в альбоме.
         """
@@ -58,7 +53,7 @@ class VkApi:
         resp.raise_for_status()
         self.photo_info = resp.json()['response'][0]
 
-    def publish_comic_on_wall(self):
+    def __publish_comic_on_wall(self):
         """
         Публикует комикс на стене.
         """
@@ -74,7 +69,23 @@ class VkApi:
         url = f'{self.api_vk_method}wall.post'
         resp = self.session.post(url, params=self.payload)
         resp.raise_for_status()
-        if resp.json()['response'].get('post_id'):
-            os.remove(self.comic_path)
+        self.post_id = resp.json()['response'].get('post_id')
+        if self.post_id:
+            print('Комикс опубликован!')
         else:
-            print('Комикс не опубликован!')
+            raise ValueError('Комикс не опубликован!')
+
+    def publish_comic(self, comic_path, comic_message):
+        """
+        Публикует комикс на стене группы.
+
+        :param comic_path: путь до комикса "path/comic.png"
+        :param comic_message: текст комикса.
+        """
+        self.comic_path = comic_path
+        self.message = comic_message
+
+        self.__get_server_address()
+        self.__upload_image_on_server()
+        self.__save_comic_in_album()
+        self.__publish_comic_on_wall()
