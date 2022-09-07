@@ -1,5 +1,6 @@
 import os
 import random
+import time
 import urllib.parse
 
 import environs
@@ -75,15 +76,18 @@ def main():
     env.read_env()
     vk_token = env.str('VK_TOKEN')
     group_id = env.int('VK_GROUP_ID')
+    publication_interval = env.int('PUBLICATION_INTERVAL')
 
-    xkcd = Xkcd()
-    xkcd.download_comic()
-    xkcd_comic_path = xkcd.comic['comic_path']
-    xkcd_comic_message = xkcd.comic['alt']
-    vk = VkApi(vk_token, group_id)
-    vk.publish_comic(comic_path=xkcd_comic_path, comic_message=xkcd_comic_message)
-    if vk.post_id:
-        xkcd.delete_comic()
+    while True:
+        xkcd = Xkcd()
+        xkcd.download_comic()
+        xkcd_comic_path = xkcd.comic['comic_path']
+        xkcd_comic_message = xkcd.comic['alt']
+        vk = VkApi(vk_token, group_id)
+        vk.publish_comic(comic_path=xkcd_comic_path, comic_message=xkcd_comic_message)
+        if vk.post_id:
+            xkcd.delete_comic()
+            time.sleep(publication_interval)
 
 
 if __name__ == '__main__':
