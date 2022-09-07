@@ -1,4 +1,4 @@
-# Автопостинг комиксов Xkcd в группу Вконтакте.
+# Автопостинг комиксов Xkcd в группу Вконтакте
 
 Скрипт позволяет загружать комикс по api VK в группу Вконтакте.
 
@@ -40,15 +40,23 @@ pip install -r requirements.txt
 ```text
 https://oauth.vk.com/authorize?client_id=YOUR_APP_ID&display=page&scope=photos,groups,wall,offline&response_type=token&v=5.131&state=123456
 ```
-11. Создайте файл `.env` и сохраните в нем ваш токен и id группы:
+11. Создайте файл `.env` и сохраните в нем ваш токен, id группы и интервал публикации в секундах:
 ```text
 VK_TOKEN=your_token
 VK_GROUP_ID=your_group_id
+PUBLICATION_INTERVAL=86400  #  86400 секунд = 24 часа
 ```
 
 ## Запуск
 ```commandline
 python xkcd.py
+```
+
+### Запуск в докере на сервере
+1. Создать файл .env
+2. Выполнить команду
+```commandline
+docker run -d --name sending_comics_in_vk --restart always --env-file .env nanku/sending_comics_in_vk
 ```
 
 ## Результат
